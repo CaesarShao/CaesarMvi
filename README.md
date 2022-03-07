@@ -1,19 +1,19 @@
-# CaesarMvi
 ## Mvi架构模式开发
 
 前言：随着谷歌推广各种设计模式，慢慢地我们好像将其当成了一种新技术来使用，觉得在新的项目必须要用上新的设计模式，就能使应用变得更加流畅和稳定。设计模式只是一种手段，不管是Mvi模式还是Mvc模式，都是来规矩我们的运行逻辑。
 没有最好的设计模式，只有更适合项目业务逻辑的设计思维。
 
+本demo的github地址为：https://github.com/CaesarShao/CaesarMvi.git
+
 不过新推出的我们肯定要去试试了解。
 
 <img src="/Users/caesar/Documents/mvi图片.png" alt="mvi图片" style="zoom:60%;" />
 
-Mvi模式采用单向流动的设计思路，用户意图Intent通过View层传输到Model，数据处理完毕之后，再返回状态State到View层显示,由此一个循环结束.一个界面的所有东西,都是不断循环在一个闭环内,所以数据的流向都能方便的监测到,哪一环出现问题就能快速的定位到问题所在.
+Mvi模式采用单向流动的设计思路，用户意图Intent通过View层传输到Model，数据处理完毕之后，再返回状态State到View层显示,由此一个循环结束.一个界面的所有东西,都是不断循环在一个闭环内,所以数据的流向都能方便地监测到,哪一环出现问题就能快速地定位到问题所在.
 
 接下来我们来看一下实际应用
 
-举例有一个简单的新闻界面,用户去看新闻,这个界面用户能看到的,是不是就是新闻的内容,还有加载弹窗的显示与消失,我们定义一个
-NewState,里面定义几个接口,开始网络请求,网络请求结束,数据返回,失败信息返回.
+举例有一个简单的新闻界面,用户去看新闻,这个界面用户能看到的,是不是就是新闻的内容,还有加载弹窗的显示与消失,我们定义一个NewState,里面定义几个接口,开始网络请求,网络请求结束,数据返回,失败信息返回.
 
 ```kotlin
 sealed class NewState {
@@ -49,7 +49,7 @@ class NewViewModel() : ViewModel() {
             }
         }
     }
-    private fun loadNet() {
+    private fun loadNet() {//模拟网络请求
         state.value = NewState.loadingNews
         viewModelScope.launch(Dispatchers.IO) {
             delay(3000)
@@ -103,9 +103,9 @@ srlShow?.setOnRefreshListener {
     }
 ```
 
-获取viewmodel中的userIntent意图，监听state状态返回，根据不同的结果，显示不同的UI，因为所有的意图都会转换成state从一处返回，我们就可以统一管理，出现异常的话，也容易追踪排查。
+获取viewmodel中的userIntent意图，监听state状态返回，根据不同的结果，显示不同的UI，因为所有的意图都会转换成state从一处返回，我们就可以统一管理，出现异常的话，也容易追踪排查。这样一个简单地闭环系统就完成了。
 
-当然，实际应用不会像demo那样简单，我们经常要监听整个app的消息，获取其他地方的消息，一个界面中，可能要监听多个state，意味着有多个闭环存在，这种情况应该怎么处理，这边给出一个简单地解决方案.
+当然，实际应用不会像demo那样简单，我们经常要监听整个app的消息，获取其他地方的消息，一个界面中，可能要监听多个state，意味着有多个闭环存在，这种情况应该怎么处理，这边给出一个简单的解决方案.
 
 ```kotlin
 sealed class GlobalIntent {
@@ -150,7 +150,7 @@ class MyApp:Application() {
 }
 ```
 
-创建2个全局的意图和状态，其处理跟普通的界面的处理方式一样，然后我们有2个界面，都订阅了全局的state。
+创建2个简单地全局意图和状态，然后我们有2个界面，都订阅了全局的state。
 
 ```kotlin
 class MainActivity : AppCompatActivity() {
@@ -228,6 +228,9 @@ I/caesar: MainActivity中接收到了loadingFinish
 I/caesar: GlobalActivity中接收到了loadingFinish
 ```
 
-我们在其他的地方，就可以获取到全局的数据了.
+在GlobalActivity中，我们发送一个全局的意图，数据经过全局的闭环之后，再返回到了我们订阅于全局state的2个Activity中，就可以获取到全局的数据了。
 
+本demo中的例子比较的简单，主要是讲一个闭环的思路模式，其中的Channel和MutableStateFlow只不过是官方给我们提供的通道工具，我们可以按照项目的需求自己替换，甚至用eventBus也可以代替，核心就是将我们的UI和数据处理处于一个闭环的通道，使得项目按照既定的模式运行。
+
+转载请标明出处。
 
