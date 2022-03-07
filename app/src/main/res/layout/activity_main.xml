@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/btn_net"
+        android:layout_width="match_parent"
+        android:text="模拟网络请求"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/btn_global"
+        android:layout_width="match_parent"
+        android:text="全局多个监听"
+        android:layout_height="wrap_content"/>
+
+
+</LinearLayout>
